@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Power BI Relationships – IPL Cricket Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --surface: #111827;
+    --surface2: #1a2235;
+    --border: #2a3a55;
+    --accent: #00d4aa;
+    --accent2: #f59e0b;
+    --accent3: #ef4444;
+    --accent4: #6366f1;
+    --text: #e2e8f0;
+    --text-muted: #8899aa;
+    --text-dim: #556677;
+    --glow: rgba(0,212,170,0.15);
+    --glow2: rgba(245,158,11,0.12);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.7;overflow-x:hidden}
+
+  /* --- HEADER --- */
+  header{background:linear-gradient(135deg,#0a0e1a 0%,#0f172a 50%,#0a1628 100%);border-bottom:1px solid var(--border);padding:0 0 0 0;position:relative;overflow:hidden}
+  header::before{content:'';position:absolute;top:-50%;left:-10%;width:60%;height:200%;background:radial-gradient(ellipse,rgba(0,212,170,0.07) 0%,transparent 70%);pointer-events:none}
+  header::after{content:'';position:absolute;top:0;right:0;width:40%;height:100%;background:radial-gradient(ellipse at right,rgba(99,102,241,0.08) 0%,transparent 70%);pointer-events:none}
+  .header-inner{max-width:1100px;margin:0 auto;padding:48px 32px 36px}
+  .back-link{display:inline-flex;align-items:center;gap:6px;color:var(--accent);font-size:13px;text-decoration:none;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px;opacity:.8;transition:opacity .2s}
+  .back-link:hover{opacity:1}
+  .cricket-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(0,212,170,0.1);border:1px solid rgba(0,212,170,0.25);color:var(--accent);padding:4px 14px;border-radius:20px;font-size:12px;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+  h1{font-family:'Rajdhani',sans-serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:700;line-height:1.1;margin-bottom:12px}
+  h1 span{color:var(--accent)}
+  .header-sub{color:var(--text-muted);font-size:16px;max-width:580px;margin-bottom:32px}
+  .nav-pills{display:flex;flex-wrap:wrap;gap:8px}
+  .pill{background:var(--surface);border:1px solid var(--border);color:var(--text-muted);padding:7px 18px;border-radius:20px;font-size:13px;cursor:pointer;transition:all .2s;text-decoration:none;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:.5px}
+  .pill:hover,.pill.active{background:var(--accent);border-color:var(--accent);color:#000}
+
+  /* --- LAYOUT --- */
+  main{max-width:1100px;margin:0 auto;padding:48px 32px}
+  section{margin-bottom:72px}
+  .section-label{font-family:'Rajdhani',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+  h2{font-family:'Rajdhani',sans-serif;font-size:clamp(1.5rem,3vw,2rem);font-weight:700;margin-bottom:8px}
+  h3{font-family:'Rajdhani',sans-serif;font-size:1.2rem;font-weight:600;margin-bottom:8px;color:var(--text)}
+  p{color:var(--text-muted);margin-bottom:14px}
+  p strong{color:var(--text)}
+
+  /* --- CARDS --- */
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px}
+  .card-accent{border-left:3px solid var(--accent)}
+  .card-warn{border-left:3px solid var(--accent2)}
+  .card-danger{border-left:3px solid var(--accent3)}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:700px){.grid2,.grid3{grid-template-columns:1fr}}
+
+  /* --- TABLES --- */
+  .table-wrap{overflow-x:auto;border-radius:8px;border:1px solid var(--border)}
+  table{width:100%;border-collapse:collapse;font-size:13px;font-family:'JetBrains Mono',monospace}
+  thead tr{background:var(--surface2)}
+  th{padding:10px 14px;text-align:left;color:var(--accent);font-weight:600;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+  td{padding:9px 14px;border-bottom:1px solid rgba(42,58,85,.5);color:var(--text-muted)}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:rgba(0,212,170,.04);color:var(--text)}
+  td.key{color:var(--accent2);font-weight:600}
+  td.match{color:var(--accent);font-weight:600}
+  td.hl{color:var(--text);font-weight:500}
+
+  /* --- RELATIONSHIP VISUALIZER --- */
+  .rel-viz{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:32px;margin:20px 0}
+  .rel-boxes{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap}
+  .rel-table{background:var(--surface2);border:2px solid var(--border);border-radius:10px;padding:16px 20px;min-width:160px;text-align:center}
+  .rel-table .tname{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1rem;color:var(--accent);margin-bottom:8px}
+  .rel-table .trow{font-size:12px;font-family:'JetBrains Mono',monospace;padding:3px 0;color:var(--text-muted);border-bottom:1px solid rgba(42,58,85,.4);text-align:left}
+  .rel-table .trow:last-child{border:none}
+  .rel-table .trow.pk{color:var(--accent2)}
+  .rel-table .trow.fk{color:var(--accent)}
+  .rel-connector{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 12px;min-width:120px}
+  .rel-line{width:100%;height:2px;background:var(--border);position:relative;display:flex;align-items:center;justify-content:center}
+  .rel-line.active{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+  .rel-symbol{background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:3px 10px;font-size:11px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;white-space:nowrap;color:var(--text);z-index:1;position:relative}
+  .rel-symbol.active{background:rgba(0,212,170,.15);border-color:var(--accent);color:var(--accent)}
+  .rel-arrow{font-size:20px;color:var(--accent);margin:0 -2px}
+  .rel-note{text-align:center;font-size:12px;color:var(--text-muted);margin-top:12px}
+
+  /* --- FILTER DIRECTION VIZ --- */
+  .filter-viz{display:flex;flex-direction:column;gap:12px}
+  .filter-row{display:flex;align-items:center;gap:12px}
+  .ftable{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:.9rem;min-width:120px;text-align:center}
+  .ftable.filtered{border-color:var(--accent);color:var(--accent);background:rgba(0,212,170,.08)}
+  .ftable.source{border-color:var(--accent2);color:var(--accent2);background:rgba(245,158,11,.08)}
+  .arrow-flow{font-size:22px;color:var(--accent)}
+  .arrow-both{font-size:22px;color:var(--accent4)}
+
+  /* --- INTERACTIVE DEMO --- */
+  #demo-section{scroll-margin-top:20px}
+  .demo-controls{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+  .demo-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);padding:8px 20px;border-radius:8px;cursor:pointer;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:.9rem;letter-spacing:.5px;transition:all .2s}
+  .demo-btn:hover{border-color:var(--accent);color:var(--text)}
+  .demo-btn.active{background:rgba(0,212,170,.15);border-color:var(--accent);color:var(--accent)}
+  .demo-result{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+  .demo-header{background:var(--surface2);padding:14px 20px;border-bottom:1px solid var(--border);font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--accent);font-size:.9rem;letter-spacing:1px;text-transform:uppercase}
+  .demo-body{padding:20px}
+  .scenario-badge{display:inline-block;background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#a5b4fc;padding:3px 12px;border-radius:4px;font-size:11px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;margin-bottom:12px}
+  .filter-highlight{background:rgba(0,212,170,.08);border:1px solid rgba(0,212,170,.2);border-radius:6px;padding:12px 16px;margin:10px 0;font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--accent)}
+  .problem-badge{display:inline-block;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:#fca5a5;padding:3px 12px;border-radius:4px;font-size:11px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;margin-bottom:12px}
+
+  /* --- CIRCULAR REF SECTION --- */
+  .warning-box{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.25);border-radius:10px;padding:20px 24px;margin:12px 0}
+  .warning-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.1rem;color:#fca5a5;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  .solution-box{background:rgba(0,212,170,.06);border:1px solid rgba(0,212,170,.2);border-radius:10px;padding:20px 24px;margin:12px 0}
+  .solution-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:1.1rem;color:var(--accent);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+  code{font-family:'JetBrains Mono',monospace;background:rgba(0,212,170,.1);color:var(--accent);padding:2px 7px;border-radius:4px;font-size:12px}
+  .dax-block{background:#0a0e1a;border:1px solid var(--border);border-radius:8px;padding:16px;font-family:'JetBrains Mono',monospace;font-size:13px;color:#a5f3fc;margin:10px 0;overflow-x:auto}
+  .dax-block .kw{color:#c084fc}
+  .dax-block .fn{color:#f59e0b}
+  .dax-block .str{color:#86efac}
+  .dax-block .cm{color:#475569}
+
+  /* --- LEVEL TAGS --- */
+  .level-tag{display:inline-block;padding:2px 10px;border-radius:4px;font-size:11px;font-family:'Rajdhani',sans-serif;font-weight:700;letter-spacing:1px;margin-right:8px;margin-bottom:6px}
+  .lv-beg{background:rgba(0,212,170,.15);color:var(--accent)}
+  .lv-int{background:rgba(245,158,11,.15);color:var(--accent2)}
+  .lv-exp{background:rgba(239,68,68,.15);color:#fca5a5}
+
+  /* --- STAR SCHEMA --- */
+  .star-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;position:relative}
+  .star-center{grid-column:2;grid-row:1;background:rgba(0,212,170,.08);border:2px solid var(--accent);border-radius:10px;padding:14px 16px;text-align:center}
+  .star-dim{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;text-align:center}
+  .star-center .tname{color:var(--accent)}
+  .star-dim .tname{color:var(--text-muted);font-family:'Rajdhani',sans-serif;font-size:.85rem;font-weight:700}
+
+  /* --- FOOTER --- */
+  footer{border-top:1px solid var(--border);padding:32px;text-align:center;color:var(--text-dim);font-size:13px}
+  footer a{color:var(--accent);text-decoration:none}
+
+  /* --- ANIMATIONS --- */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+  .fade-in{animation:fadeUp .4s ease both}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,212,170,.3)}50%{box-shadow:0 0 0 6px rgba(0,212,170,0)}}
+  .pulse{animation:pulse 2s infinite}
+  @keyframes flowRight{from{left:-100%}to{left:100%}}
+  .flow-line{position:relative;overflow:hidden}
+  .flow-line::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(0,212,170,.6),transparent);animation:flowRight 2s linear infinite}
+
+  /* scrollbar */
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <a class="back-link" href="https://akthecap.github.io/akthecap/">← Back to Portfolio</a>
+    <div class="cricket-badge">🏏 IPL Cricket Edition</div>
+    <h1>Power BI <span>Table Relationships</span></h1>
+    <p class="header-sub">Master Cardinality & Cross-Filter Direction using real IPL cricket data — from beginner to expert.</p>
+    <nav class="nav-pills">
+      <a class="pill active" href="#basics">Basics</a>
+      <a class="pill" href="#cardinality">Cardinality</a>
+      <a class="pill" href="#crossfilter">Cross-Filter</a>
+      <a class="pill" href="#demo-section">Interactive Demo</a>
+      <a class="pill" href="#circular">Circular Ref Fix</a>
+      <a class="pill" href="#schema">Star Schema</a>
+      <a class="pill" href="#expert">Expert Tips</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ========== SECTION 0: BASICS ========== -->
+<section id="basics" class="fade-in">
+  <div class="section-label">01 — Foundation</div>
+  <h2>What is a Table Relationship?</h2>
+  <p>In Power BI, you almost always have <strong>multiple tables</strong>. A "relationship" is the <strong>link</strong> between two tables using a common column (called a <strong>key</strong>). Think of it like a bridge.</p>
+
+  <div class="card card-accent" style="margin-bottom:20px">
+    <span class="level-tag lv-beg">Beginner</span>
+    <h3>IPL Analogy</h3>
+    <p>Imagine two scoresheets:</p>
+    <ul style="color:var(--text-muted);padding-left:20px;line-height:2">
+      <li><strong style="color:var(--text)">match_info</strong> — has one row per match (Match 335989, Match 335991…)</li>
+      <li><strong style="color:var(--text)">toss_winners</strong> — has who won the toss in each match</li>
+    </ul>
+    <p style="margin-top:8px">Both have a column called <code>match_number</code>. Power BI uses this to <em>join</em> them — like pinning two scoresheets together by the match number.</p>
+  </div>
+
+  <div class="grid2">
+    <div>
+      <div class="section-label" style="font-size:10px">match_info table</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>match_number</th><th>venue</th><th>winner</th></tr></thead>
+          <tbody>
+            <tr><td class="key">335989</td><td>Wankhede</td><td class="hl">MI</td></tr>
+            <tr><td class="key">335991</td><td>Eden Gardens</td><td class="hl">KKR</td></tr>
+            <tr><td class="key">336008</td><td>Chepauk</td><td class="hl">CSK</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="section-label" style="font-size:10px">toss_winners table</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>match_number</th><th>toss_winner</th><th>toss_decision</th></tr></thead>
+          <tbody>
+            <tr><td class="fk key">335989</td><td>MI</td><td>field</td></tr>
+            <tr><td class="fk key">335991</td><td>KKR</td><td>bat</td></tr>
+            <tr><td class="fk key">336008</td><td>CSK</td><td>field</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="rel-viz" style="margin-top:20px">
+    <div class="rel-boxes">
+      <div class="rel-table">
+        <div class="tname">match_info</div>
+        <div class="trow pk">🔑 match_number</div>
+        <div class="trow">venue</div>
+        <div class="trow">winner</div>
+        <div class="trow">result</div>
+      </div>
+      <div class="rel-connector">
+        <div class="rel-line active flow-line" style="height:3px">
+          <span class="rel-symbol active" style="position:absolute">1 ──── 1</span>
+        </div>
+        <div style="font-size:10px;color:var(--text-dim);margin-top:8px;text-align:center">match_number</div>
+      </div>
+      <div class="rel-table">
+        <div class="tname">toss_winners</div>
+        <div class="trow fk">🔗 match_number</div>
+        <div class="trow">toss_winner</div>
+        <div class="trow">toss_decision</div>
+      </div>
+    </div>
+    <div class="rel-note">🔑 Primary Key (unique) &nbsp;|&nbsp; 🔗 Foreign Key (references PK)</div>
+  </div>
+</section>
+
+<!-- ========== SECTION 1: CARDINALITY ========== -->
+<section id="cardinality">
+  <div class="section-label">02 — Cardinality</div>
+  <h2>Cardinality: How Many Rows Match?</h2>
+  <p>Cardinality describes <strong>how many rows</strong> in one table relate to <strong>how many rows</strong> in another. Power BI has 3 types.</p>
+
+  <!-- 1:1 -->
+  <div class="card card-accent" style="margin-top:20px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span class="level-tag lv-beg">Beginner</span>
+      <h3 style="margin:0">One-to-One (1:1)</h3>
+      <code style="margin-left:auto;font-size:14px;padding:4px 12px">1 : 1</code>
+    </div>
+    <p>Each row in Table A matches <strong>exactly one</strong> row in Table B, and vice versa.</p>
+    <div class="grid2">
+      <div>
+        <div class="section-label" style="font-size:10px">match_info</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>match_number (PK)</th><th>venue</th></tr></thead>
+            <tbody>
+              <tr><td class="key">335989</td><td>Wankhede</td></tr>
+              <tr><td class="key">335991</td><td>Eden Gardens</td></tr>
+              <tr><td class="key">336008</td><td>Chepauk</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="font-size:10px">toss_winners</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>match_number (FK)</th><th>toss_winner</th></tr></thead>
+            <tbody>
+              <tr><td class="key">335989</td><td class="match">MI ✓</td></tr>
+              <tr><td class="key">335991</td><td class="match">KKR ✓</td></tr>
+              <tr><td class="key">336008</td><td class="match">CSK ✓</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="solution-box" style="margin-top:12px">
+      <div class="solution-title">✅ Real use case</div>
+      <p style="margin:0">Each match has exactly one toss result. <code>match_info</code> ↔ <code>toss_winners</code> is a perfect 1:1. Use this when two tables have the same unique key and you split them for organisation.</p>
+    </div>
+  </div>
+
+  <!-- 1:M -->
+  <div class="card card-warn" style="margin-top:16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span class="level-tag lv-int">Intermediate</span>
+      <h3 style="margin:0">One-to-Many (1:*) — Most Common!</h3>
+      <code style="margin-left:auto;font-size:14px;padding:4px 12px">1 : *</code>
+    </div>
+    <p>One row in Table A corresponds to <strong>many rows</strong> in Table B. This is the backbone of most Power BI models.</p>
+    <div class="grid2">
+      <div>
+        <div class="section-label" style="font-size:10px">match_info — ONE side (1)</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>match_number (PK)</th><th>venue</th></tr></thead>
+            <tbody>
+              <tr><td class="key">335989</td><td>Wankhede</td></tr>
+              <tr><td class="key">335991</td><td>Eden Gardens</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="font-size:10px">ball_by_ball — MANY side (*)</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>match_number (FK)</th><th>over</th><th>runs</th></tr></thead>
+            <tbody>
+              <tr><td class="key">335989</td><td>1</td><td>4</td></tr>
+              <tr><td class="key">335989</td><td>1</td><td>6</td></tr>
+              <tr><td class="key">335989</td><td>2</td><td>1</td></tr>
+              <tr><td class="key">335991</td><td>1</td><td>0</td></tr>
+              <tr><td class="key">335991</td><td>1</td><td>2</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="solution-box" style="margin-top:12px">
+      <div class="solution-title">✅ Real use case</div>
+      <p style="margin:0">Match 335989 has <strong>hundreds of balls bowled</strong>. So <code>match_info</code> (1 row per match) → <code>ball_by_ball</code> (many rows per match) is a classic 1:Many. <strong>The "1" side always has unique values.</strong></p>
+    </div>
+  </div>
+
+  <!-- M:M -->
+  <div class="card card-danger" style="margin-top:16px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <span class="level-tag lv-exp">Expert</span>
+      <h3 style="margin:0">Many-to-Many (*:*) — Handle with Care!</h3>
+      <code style="margin-left:auto;font-size:14px;padding:4px 12px">* : *</code>
+    </div>
+    <p>Many rows in Table A match many rows in Table B. This can cause <strong>double-counting</strong> and unexpected results.</p>
+    <div class="grid2">
+      <div>
+        <div class="section-label" style="font-size:10px">playing_XI (player in match)</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>match_number</th><th>player</th></tr></thead>
+            <tbody>
+              <tr><td>335989</td><td>Rohit Sharma</td></tr>
+              <tr><td>335989</td><td>Bumrah</td></tr>
+              <tr><td>335991</td><td>Rohit Sharma</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="section-label" style="font-size:10px">players_details</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>player</th><th>country</th><th>role</th></tr></thead>
+            <tbody>
+              <tr><td>Rohit Sharma</td><td>India</td><td>Batsman</td></tr>
+              <tr><td>Bumrah</td><td>India</td><td>Bowler</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="warning-box" style="margin-top:12px">
+      <div class="warning-title">⚠️ Why M:M is dangerous</div>
+      <p style="margin:0;color:var(--text-muted)">If you join <code>playing_XI</code> to <code>players_details</code> on <code>player</code> directly, Power BI creates a Many-to-Many. Aggregations like <em>SUM of runs</em> can get <strong>multiplied incorrectly</strong>. Always resolve M:M using a <strong>bridge table</strong> or a proper dimension table.</p>
+    </div>
+    <div class="solution-box" style="margin-top:8px">
+      <div class="solution-title">✅ Solution: Use a unique Dimension table</div>
+      <p style="margin:0;color:var(--text-muted)">Create a <code>dim_players</code> table with one unique row per player. Then: <code>playing_XI</code> (*) → <code>dim_players</code> (1) and <code>ball_by_ball</code> (*) → <code>dim_players</code> (1). No M:M needed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 2: CROSS-FILTER ========== -->
+<section id="crossfilter">
+  <div class="section-label">03 — Cross-Filter Direction</div>
+  <h2>Cross-Filter Direction</h2>
+  <p>When you select/filter a value in one table, which other tables get filtered? That's cross-filter direction. Think of it as <strong>"which way does the filter flow?"</strong></p>
+
+  <div class="grid2" style="margin-top:20px">
+    <!-- Single -->
+    <div class="card card-accent">
+      <span class="level-tag lv-beg">Beginner</span>
+      <h3>Single Direction →</h3>
+      <p>Filter flows in <strong>one direction only</strong> — from the "1" (dimension) side to the "*" (fact) side. This is the <strong>default and recommended</strong> setting.</p>
+      <div class="filter-viz">
+        <div class="filter-row">
+          <div class="ftable source">match_info<br><small style="font-weight:400;font-size:10px">Dimension (1)</small></div>
+          <div class="arrow-flow">→</div>
+          <div class="ftable filtered">ball_by_ball<br><small style="font-weight:400;font-size:10px">Fact (*)</small></div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:13px;color:var(--text-muted)">
+        <strong style="color:var(--text)">Example:</strong> Select "CSK" in <code>match_info</code> → <code>ball_by_ball</code> shows only CSK balls. But you <em>cannot</em> filter match_info from ball_by_ball.
+      </div>
+    </div>
+
+    <!-- Both -->
+    <div class="card card-warn">
+      <span class="level-tag lv-int">Intermediate</span>
+      <h3>Both Directions ⇄</h3>
+      <p>Filter flows in <strong>both directions</strong>. Useful but risky — can cause <strong>circular dependency errors</strong> and unexpected filtering.</p>
+      <div class="filter-viz">
+        <div class="filter-row">
+          <div class="ftable source">match_info</div>
+          <div class="arrow-both">⇄</div>
+          <div class="ftable source">ball_by_ball</div>
+        </div>
+      </div>
+      <div style="margin-top:12px;font-size:13px;color:var(--text-muted)">
+        <strong style="color:var(--text)">Example:</strong> Select a ball in <code>ball_by_ball</code> → <code>match_info</code> also gets filtered to show only that match. Used in your screenshot (toss_winners ↔ match_info with Both).
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <span class="level-tag lv-exp">Expert</span>
+    <h3>When to Use "Both" — The Rule</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px">
+      <div>
+        <div style="color:var(--accent);font-family:'Rajdhani',sans-serif;font-weight:700;margin-bottom:6px">✅ Use BOTH when:</div>
+        <ul style="color:var(--text-muted);padding-left:18px;line-height:2;font-size:13px">
+          <li>You have a <strong style="color:var(--text)">1:1 relationship</strong></li>
+          <li>You need bidirectional slicing (e.g. toss analysis vs match result)</li>
+          <li>The tables are small lookup/dimension tables</li>
+          <li>You're building a role-playing dimension</li>
+        </ul>
+      </div>
+      <div>
+        <div style="color:#fca5a5;font-family:'Rajdhani',sans-serif;font-weight:700;margin-bottom:6px">❌ Avoid BOTH when:</div>
+        <ul style="color:var(--text-muted);padding-left:18px;line-height:2;font-size:13px">
+          <li>You have <strong style="color:var(--text)">M:M relationships</strong></li>
+          <li>Multiple paths exist between tables (causes circular refs)</li>
+          <li>You're on large fact tables (performance hit)</li>
+          <li>You don't need reverse filtering</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 3: INTERACTIVE DEMO ========== -->
+<section id="demo-section">
+  <div class="section-label">04 — Interactive Demo</div>
+  <h2>See Filter Flow in Action</h2>
+  <p>Pick a scenario to see exactly how filters travel through the IPL data model.</p>
+
+  <div class="demo-controls">
+    <button class="demo-btn active" onclick="setScenario('single1')">Scenario 1: Single Filter</button>
+    <button class="demo-btn" onclick="setScenario('both1')">Scenario 2: Both Directions</button>
+    <button class="demo-btn" onclick="setScenario('broken')">Scenario 3: M:M Problem</button>
+    <button class="demo-btn" onclick="setScenario('fixed')">Scenario 4: M:M Fixed</button>
+  </div>
+
+  <div class="demo-result">
+    <div class="demo-header" id="demo-title">Scenario 1 — Single Direction Filter</div>
+    <div class="demo-body" id="demo-body">
+      <!-- filled by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 4: CIRCULAR REF ========== -->
+<section id="circular">
+  <div class="section-label">05 — The Error You Hit</div>
+  <h2>Circular Reference / Ambiguous Paths</h2>
+  <p>This is the error you mentioned. It happens when Power BI finds <strong>more than one path</strong> to connect two tables — and doesn't know which one to use.</p>
+
+  <div class="warning-box">
+    <div class="warning-title">🔴 What causes it in IPL data?</div>
+    <p style="color:var(--text-muted)">Look at your model: <code>match_info</code> connects to <code>toss_winners</code> AND both might connect to <code>match_teams</code>. If you also have <code>batting_team</code> and <code>bowling_team</code> both pointing to a teams table with <strong>Both-direction</strong> filters, you create an ambiguous loop:</p>
+    <div class="dax-block">
+<span class="cm">// Power BI sees two paths from batting_team to bowling_team:</span>
+batting_team → match_info ← bowling_team
+batting_team → teams_info ← bowling_team
+<span class="cm">// Power BI doesn't know which path to use → ERROR</span>
+    </div>
+  </div>
+
+  <div class="grid3" style="margin:20px 0">
+    <div class="card card-danger">
+      <h3 style="color:#fca5a5">❌ Problem Setup</h3>
+      <div class="rel-viz" style="padding:12px">
+        <div style="text-align:center;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);line-height:2">
+          batting_team ⇄ match_info<br>bowling_team ⇄ match_info<br>batting_team ⇄ teams_info ⇄ bowling_team<br><span style="color:#fca5a5">↑ Circular loop!</span>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--accent2)">💡 Why it breaks</h3>
+      <p style="font-size:13px">With "Both" direction on multiple paths, the filter doesn't know where to stop. It bounces between tables infinitely.</p>
+      <p style="font-size:13px">Power BI <strong style="color:var(--text)">deactivates one relationship</strong> and shows a warning, or throws an error in DAX.</p>
+    </div>
+    <div class="card card-accent">
+      <h3>✅ Fixes</h3>
+      <ol style="color:var(--text-muted);padding-left:18px;font-size:13px;line-height:2.2">
+        <li>Change "Both" → <strong style="color:var(--text)">Single</strong></li>
+        <li>Use <strong style="color:var(--text)">USERELATIONSHIP()</strong> in DAX</li>
+        <li>Mark one relationship as <strong style="color:var(--text)">Inactive</strong></li>
+        <li>Redesign as a <strong style="color:var(--text)">Star Schema</strong></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="solution-box">
+    <div class="solution-title">✅ The Fix for Your Screenshot</div>
+    <p style="color:var(--text-muted)">In your <code>toss_winners → match_info</code> relationship, you used <strong>Both</strong> direction + 1:1. That's fine <em>by itself</em>. The problem occurs when <em>another table</em> also has a "Both" relationship to either of these. Fix: change all fact-table relationships to <strong>Single</strong>, and only use Both on true 1:1 dimension lookups.</p>
+    <div class="dax-block">
+<span class="cm">-- When you MUST use two paths, use USERELATIONSHIP in DAX:</span>
+<span class="fn">CALCULATE</span>(
+    <span class="fn">SUM</span>(ball_by_ball[runs_scored]),
+    <span class="fn">USERELATIONSHIP</span>(match_info[match_number], batting_team[match_number])
+)
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 5: STAR SCHEMA ========== -->
+<section id="schema">
+  <div class="section-label">06 — Best Practice</div>
+  <h2>Star Schema for IPL Data</h2>
+  <p>The <strong>star schema</strong> is the gold standard for Power BI models. One central <em>fact table</em> surrounded by <em>dimension tables</em>. All filters flow <strong>inward</strong> — no circular paths possible.</p>
+
+  <div class="card" style="margin-top:16px">
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center;align-items:center">
+      <div class="star-dim">
+        <div class="tname">dim_teams</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">team_name<br>city<br>home_ground</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:var(--border);font-size:24px">→</div>
+      <div style="background:rgba(0,212,170,.08);border:2px solid var(--accent);border-radius:10px;padding:14px 8px;text-align:center">
+        <div style="font-family:'Rajdhani',sans-serif;font-weight:700;color:var(--accent);font-size:1rem;margin-bottom:8px">⭐ ball_by_ball</div>
+        <div style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--text-dim);line-height:1.8">match_number<br>player_id<br>team_id<br>over<br>ball<br>runs</div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:center;color:var(--border);font-size:24px">←</div>
+      <div class="star-dim">
+        <div class="tname">dim_players</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:4px">player_id<br>player_name<br>country<br>role</div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;text-align:center;margin-top:8px">
+      <div></div>
+      <div></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <div style="color:var(--border);font-size:20px">↑</div>
+        <div class="star-dim">
+          <div class="tname">dim_matches</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:4px">match_number<br>date<br>venue<br>result</div>
+        </div>
+        <div style="color:var(--border);font-size:20px">↓</div>
+        <div class="star-dim">
+          <div class="tname">dim_date</div>
+          <div style="font-size:11px;color:var(--text-dim);margin-top:4px">date<br>year<br>season<br>month</div>
+        </div>
+      </div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:16px">
+    <div class="card card-accent">
+      <h3>Star Schema Rules</h3>
+      <ol style="color:var(--text-muted);padding-left:18px;line-height:2.2;font-size:13px">
+        <li>Fact table in the <strong style="color:var(--text)">center</strong> (ball_by_ball, batting scores)</li>
+        <li>Dimension tables on the <strong style="color:var(--text)">outside</strong> (teams, players, dates)</li>
+        <li>All relationships are <strong style="color:var(--text)">1:Many</strong> (dim → fact)</li>
+        <li>All filters are <strong style="color:var(--text)">Single direction</strong> (dim → fact)</li>
+        <li>No table connects to another dimension directly</li>
+      </ol>
+    </div>
+    <div class="card card-warn">
+      <h3>Your IPL Table Mapping</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Your Table</th><th>Type</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td>ball_by_ball</td><td><span style="color:var(--accent)">FACT</span></td><td>⭐ Center</td></tr>
+            <tr><td>match_info</td><td><span style="color:var(--accent2)">DIM</span></td><td>Match details</td></tr>
+            <tr><td>players_details</td><td><span style="color:var(--accent2)">DIM</span></td><td>Player info</td></tr>
+            <tr><td>toss_winners</td><td><span style="color:var(--accent2)">DIM</span></td><td>Toss info</td></tr>
+            <tr><td>teams_info</td><td><span style="color:var(--accent2)">DIM</span></td><td>Team info</td></tr>
+            <tr><td>venue_info</td><td><span style="color:var(--accent2)">DIM</span></td><td>Venue info</td></tr>
+            <tr><td>Date Table</td><td><span style="color:var(--accent2)">DIM</span></td><td>Calendar</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ========== SECTION 6: EXPERT TIPS ========== -->
+<section id="expert">
+  <div class="section-label">07 — Expert Level</div>
+  <h2>Expert Tips & DAX Tricks</h2>
+
+  <div class="grid2">
+    <div class="card card-accent">
+      <span class="level-tag lv-exp">Expert</span>
+      <h3>USERELATIONSHIP()</h3>
+      <p style="font-size:13px">When you have <strong>inactive relationships</strong> (e.g., a match has both a batting team and a bowling team, both pointing to dim_teams), use this in DAX to specify which path to use:</p>
+      <div class="dax-block">
+<span class="cm">// Runs scored BY batting team</span>
+Batting_Runs = <span class="fn">CALCULATE</span>(
+    <span class="fn">SUM</span>(ball_by_ball[runs_scored]),
+    <span class="fn">USERELATIONSHIP</span>(
+        batting_team[match_number],
+        ball_by_ball[match_number]
+    )
+)
+      </div>
+    </div>
+
+    <div class="card card-warn">
+      <span class="level-tag lv-exp">Expert</span>
+      <h3>CROSSFILTER()</h3>
+      <p style="font-size:13px">Override filter direction <em>inside a specific measure</em> without changing the model relationship:</p>
+      <div class="dax-block">
+<span class="cm">// Force bidirectional filter for this measure only</span>
+Matches_Won = <span class="fn">CALCULATE</span>(
+    <span class="fn">COUNTROWS</span>(match_info),
+    <span class="fn">CROSSFILTER</span>(
+        match_info[winner],
+        teams_info[team_name],
+        Both
+    )
+)
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="level-tag lv-exp">Expert</span>
+      <h3>Role-Playing Dimensions</h3>
+      <p style="font-size:13px">Your model has <code>batting_team</code> and <code>bowling_team</code> — both refer to team names. Instead of two tables, use <strong>one dim_teams</strong> with <strong>two inactive relationships</strong>:</p>
+      <div class="dax-block">
+<span class="cm">-- Active: ball_by_ball[batting_team] → dim_teams[team]</span>
+<span class="cm">-- Inactive: ball_by_ball[bowling_team] → dim_teams[team]</span>
+
+<span class="cm">-- In DAX, activate the inactive one:</span>
+Bowling_Team_Wickets = <span class="fn">CALCULATE</span>(
+    <span class="fn">SUM</span>(ball_by_ball[is_wicket]),
+    <span class="fn">USERELATIONSHIP</span>(
+        ball_by_ball[bowling_team],
+        dim_teams[team_name]
+    )
+)
+      </div>
+    </div>
+
+    <div class="card">
+      <span class="level-tag lv-exp">Expert</span>
+      <h3>Performance Rules</h3>
+      <ol style="color:var(--text-muted);padding-left:18px;font-size:13px;line-height:2.2">
+        <li><strong style="color:var(--text)">Integer keys</strong> are faster than string keys — use match_number (int) not match_date (string)</li>
+        <li><strong style="color:var(--text)">Avoid Both</strong> on large fact tables — it creates hidden filter propagation</li>
+        <li><strong style="color:var(--text)">Date Table</strong> must always be marked as official Date Table in Power BI</li>
+        <li><strong style="color:var(--text)">Hide FK columns</strong> in fact tables — show only from dimension side</li>
+        <li><strong style="color:var(--text)">Referential integrity</strong> assumption speeds queries — only enable if data is clean</li>
+      </ol>
+    </div>
+  </div>
+
+  <!-- Summary Table -->
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-bottom:16px">Quick Reference: When to Use What</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Situation</th>
+            <th>Cardinality</th>
+            <th>Cross Filter</th>
+            <th>IPL Example</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Match details ↔ Toss result</td>
+            <td class="match">1:1</td>
+            <td>Both or Single</td>
+            <td>match_info ↔ toss_winners</td>
+          </tr>
+          <tr>
+            <td>Match ↔ Balls bowled</td>
+            <td class="match">1:Many</td>
+            <td class="hl">Single →</td>
+            <td>match_info → ball_by_ball</td>
+          </tr>
+          <tr>
+            <td>Player ↔ Matches played</td>
+            <td class="match">1:Many</td>
+            <td class="hl">Single →</td>
+            <td>dim_players → playing_XI</td>
+          </tr>
+          <tr>
+            <td>Team (batting) ↔ Ball events</td>
+            <td class="match">1:Many</td>
+            <td class="hl">Single →</td>
+            <td>dim_teams → ball_by_ball (active)</td>
+          </tr>
+          <tr>
+            <td>Team (bowling) ↔ Ball events</td>
+            <td class="match">1:Many</td>
+            <td class="hl">Single →</td>
+            <td>dim_teams → ball_by_ball (inactive)</td>
+          </tr>
+          <tr>
+            <td>Date ↔ Match</td>
+            <td class="match">1:Many</td>
+            <td class="hl">Single →</td>
+            <td>dim_date → match_info</td>
+          </tr>
+          <tr>
+            <td>Player ↔ Team (current)</td>
+            <td style="color:#fca5a5">Avoid M:M</td>
+            <td style="color:#fca5a5">—</td>
+            <td>Use a bridge table instead</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <p>Built for <a href="https://akthecap.github.io/akthecap/">akthecap.github.io</a> &nbsp;·&nbsp; IPL data examples inspired by open Kaggle datasets &nbsp;·&nbsp; Part of Power BI Learning Series</p>
+</footer>
+
+<script>
+const scenarios = {
+  single1: {
+    title: "Scenario 1 — Single Direction Filter (Recommended)",
+    badge: "single",
+    html: `
+      <div class="scenario-badge">CARDINALITY: 1 : Many &nbsp;|&nbsp; FILTER: Single →</div>
+      <p><strong>Question:</strong> "How many balls were bowled in matches played at Wankhede Stadium?"</p>
+      <p>You filter <code>match_info</code> by venue = "Wankhede". Because the filter direction is <strong>Single</strong> (match_info → ball_by_ball), the filter automatically flows down:</p>
+      <div class="filter-highlight">
+        match_info [venue = "Wankhede"]
+            ↓ Single filter flows down
+        ball_by_ball [shows only Wankhede balls]
+      </div>
+      <div class="grid2">
+        <div>
+          <div class="section-label" style="font-size:10px">match_info (filtered)</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>match_number</th><th>venue</th><th>winner</th></tr></thead>
+              <tbody>
+                <tr style="background:rgba(0,212,170,.08)"><td class="match">335989 ✓</td><td class="match">Wankhede ✓</td><td>MI</td></tr>
+                <tr style="opacity:.3"><td>335991</td><td>Eden Gardens</td><td>KKR</td></tr>
+                <tr style="opacity:.3"><td>336008</td><td>Chepauk</td><td>CSK</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="section-label" style="font-size:10px">ball_by_ball (auto-filtered)</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>match_number</th><th>over</th><th>runs</th></tr></thead>
+              <tbody>
+                <tr style="background:rgba(0,212,170,.08)"><td class="match">335989 ✓</td><td>1</td><td>4</td></tr>
+                <tr style="background:rgba(0,212,170,.08)"><td class="match">335989 ✓</td><td>1</td><td>6</td></tr>
+                <tr style="opacity:.3"><td>335991</td><td>1</td><td>0</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="solution-box" style="margin-top:12px">
+        <div class="solution-title">✅ Result: Works perfectly. No circular reference risk.</div>
+        <p style="margin:0;color:var(--text-muted)">Single direction = predictable, performant, and safe. Always start here.</p>
+      </div>`
+  },
+  both1: {
+    title: "Scenario 2 — Both Direction Filter",
+    badge: "both",
+    html: `
+      <div class="scenario-badge">CARDINALITY: 1:1 &nbsp;|&nbsp; FILTER: Both ⇄</div>
+      <p><strong>Question:</strong> "Which teams won the toss AND won the match?"</p>
+      <p>You need <code>toss_winners</code> and <code>match_info</code> to filter each other. "Both" direction enables this:</p>
+      <div class="filter-highlight">
+        toss_winners [toss_decision = "field"]
+            ⇄ Both direction
+        match_info [also filtered to show only field-choosing matches]
+      </div>
+      <div class="grid2">
+        <div>
+          <div class="section-label" style="font-size:10px">toss_winners (your filter)</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>match_number</th><th>toss_winner</th><th>decision</th></tr></thead>
+              <tbody>
+                <tr style="background:rgba(0,212,170,.08)"><td class="match">335989 ✓</td><td>MI</td><td class="match">field ✓</td></tr>
+                <tr style="opacity:.3"><td>335991</td><td>KKR</td><td>bat</td></tr>
+                <tr style="background:rgba(0,212,170,.08)"><td class="match">336008 ✓</td><td>CSK</td><td class="match">field ✓</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="section-label" style="font-size:10px">match_info (auto-filtered by Both)</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>match_number</th><th>venue</th><th>winner</th></tr></thead>
+              <tbody>
+                <tr style="background:rgba(0,212,170,.08)"><td class="match">335989 ✓</td><td>Wankhede</td><td>MI</td></tr>
+                <tr style="opacity:.3"><td>335991</td><td>Eden Gardens</td><td>KKR</td></tr>
+                <tr style="background:rgba(0,212,170,.08)"><td class="match">336008 ✓</td><td>Chepauk</td><td>CSK</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="warning-box" style="margin-top:12px">
+        <div class="warning-title">⚠️ Caution: Safe ONLY here because it's 1:1</div>
+        <p style="margin:0;color:var(--text-muted)">This works because toss_winners:match_info is exactly 1:1. If you add another table with "Both" that also connects to match_info, you will get a circular reference error.</p>
+      </div>`
+  },
+  broken: {
+    title: "Scenario 3 — The Circular Reference Problem",
+    badge: "broken",
+    html: `
+      <div class="problem-badge">⚠️ CIRCULAR REFERENCE / AMBIGUOUS PATH</div>
+      <p><strong>Problem Setup:</strong> You connected <code>batting_team</code> and <code>bowling_team</code> both to <code>match_info</code> with "Both" direction, AND both also connect to <code>teams_info</code> with "Both".</p>
+      <div class="filter-highlight" style="background:rgba(239,68,68,.08);border-color:rgba(239,68,68,.3);color:#fca5a5">
+        batting_team ⇄ match_info ⇄ bowling_team
+                  ↑                        ↑
+              teams_info ⇄ ——————— ⇄ teams_info
+        
+        Power BI: "Which path do I use?!" → ERROR
+      </div>
+      <div class="warning-box">
+        <div class="warning-title">🔴 What Power BI does</div>
+        <ul style="color:var(--text-muted);padding-left:18px;line-height:2;font-size:13px">
+          <li>It automatically <strong style="color:var(--text)">deactivates</strong> one of the conflicting relationships (shown with a dotted line in the model view)</li>
+          <li>Your visuals show <strong style="color:var(--text)">wrong numbers</strong> or blank results</li>
+          <li>In DAX, you get: <code style="color:#fca5a5">A circular dependency was detected</code></li>
+          <li>COUNTROWS or SUM values get <strong style="color:var(--text)">doubled or halved</strong> unexpectedly</li>
+        </ul>
+      </div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="card" style="border-color:rgba(239,68,68,.3)">
+          <h3 style="color:#fca5a5">What you set up</h3>
+          <div style="font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);line-height:2">
+            batting_team ⇄ match_info (Both)<br>
+            bowling_team ⇄ match_info (Both)<br>
+            batting_team ⇄ teams_info (Both)<br>
+            bowling_team ⇄ teams_info (Both)<br>
+            <span style="color:#fca5a5">4 "Both" = 2 circular paths</span>
+          </div>
+        </div>
+        <div class="card card-accent">
+          <h3>What you should set up</h3>
+          <div style="font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--text-muted);line-height:2">
+            dim_teams(1) → batting_team(*) [active]<br>
+            dim_teams(1) → bowling_team(*) [inactive]<br>
+            match_info(1) → batting_team(*) [Single]<br>
+            match_info(1) → bowling_team(*) [Single]<br>
+            <span style="color:var(--accent)">No "Both" on fact tables</span>
+          </div>
+        </div>
+      </div>`
+  },
+  fixed: {
+    title: "Scenario 4 — M:M Fixed with Star Schema",
+    badge: "fixed",
+    html: `
+      <div class="scenario-badge">SOLUTION: Star Schema + Role-Playing Dim</div>
+      <p><strong>Situation:</strong> You need to analyze both batting and bowling performance of teams, without circular references.</p>
+      <div class="filter-highlight">
+        dim_teams (1) ——[active]——→ ball_by_ball.batting_team (*)
+        dim_teams (1) ——[inactive]→ ball_by_ball.bowling_team (*)
+        
+        Use USERELATIONSHIP() in DAX to switch between them
+      </div>
+      <div class="grid2">
+        <div>
+          <div class="section-label" style="font-size:10px">dim_teams (ONE side — unique)</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>team_name (PK)</th><th>city</th></tr></thead>
+              <tbody>
+                <tr><td class="key">MI</td><td>Mumbai</td></tr>
+                <tr><td class="key">CSK</td><td>Chennai</td></tr>
+                <tr><td class="key">KKR</td><td>Kolkata</td></tr>
+                <tr><td class="key">RCB</td><td>Bangalore</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="section-label" style="font-size:10px">ball_by_ball (MANY side)</div>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>batting_team</th><th>bowling_team</th><th>runs</th></tr></thead>
+              <tbody>
+                <tr><td>MI</td><td>CSK</td><td>4</td></tr>
+                <tr><td>MI</td><td>CSK</td><td>6</td></tr>
+                <tr><td>CSK</td><td>MI</td><td>1</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="dax-block" style="margin-top:12px">
+<span class="cm">-- Measure 1: Total runs scored by selected team (batting)</span>
+Batting_Runs = <span class="fn">SUM</span>(ball_by_ball[runs_scored])
+<span class="cm">-- Uses the ACTIVE relationship automatically</span>
+
+<span class="cm">-- Measure 2: Runs conceded (bowling side — inactive relationship)</span>
+Bowling_Runs = <span class="fn">CALCULATE</span>(
+    <span class="fn">SUM</span>(ball_by_ball[runs_scored]),
+    <span class="fn">USERELATIONSHIP</span>(ball_by_ball[bowling_team], dim_teams[team_name])
+)
+      </div>
+      <div class="solution-box" style="margin-top:12px">
+        <div class="solution-title">✅ Result: No circular ref, full flexibility</div>
+        <p style="margin:0;color:var(--text-muted)">One dim_teams table, two relationships (one active, one inactive), controlled via DAX. This is the professional Power BI pattern for role-playing dimensions.</p>
+      </div>`
+  }
+};
+
+function setScenario(key) {
+  document.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  const s = scenarios[key];
+  document.getElementById('demo-title').textContent = s.title;
+  document.getElementById('demo-body').innerHTML = s.html;
+}
+
+// Init
+document.getElementById('demo-body').innerHTML = scenarios.single1.html;
+
+// Nav pill highlighting
+const pills = document.querySelectorAll('.pill');
+const sections = document.querySelectorAll('section');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) {
+      pills.forEach(p => p.classList.remove('active'));
+      const match = document.querySelector('.pill[href="#'+e.target.id+'"]');
+      if(match) match.classList.add('active');
+    }
+  });
+}, {threshold: 0.3});
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

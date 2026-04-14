@@ -7,282 +7,69 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
 <style>
   :root {
-    --bg:        #0a0a0a;
-    --surface:   #111111;
-    --card:      #121212;
-    --card-h:    #161616;
-    --border:    #1e1e1e;
-    --border2:   #252525;
-    --yellow:    #e8ff47;
-    --coral:     #ff6b47;
-    --sky:       #47c4ff;
-    --mint:      #47ffb8;
-    --lavender:  #b847ff;
-    --text:      #d8d4cc;
-    --muted:     #666;
-    --dim:       #333;
-    --white:     #f0ece4;
+    --bg:#0a0a0a;--surface:#111111;--card:#121212;--card-h:#161616;
+    --border:#1e1e1e;--border2:#252525;--yellow:#e8ff47;--coral:#ff6b47;
+    --sky:#47c4ff;--mint:#47ffb8;--lavender:#b847ff;--text:#d8d4cc;
+    --muted:#666;--dim:#333;--white:#f0ece4;
   }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-weight:300;font-size:14px;line-height:1.65;overflow-x:hidden}
+  body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");pointer-events:none;z-index:9999}
+  nav{padding:1.4rem 2.5rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:rgba(10,10,10,0.93);backdrop-filter:blur(14px);z-index:100;animation:dn 0.5s ease both}
+  .brand{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:0.06em;color:var(--white);text-decoration:none}
+  .brand .dot{color:var(--yellow)}
+  .nav-links{display:flex;gap:2rem;list-style:none;align-items:center}
+  .nav-links a{font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color 0.2s}
+  .nav-links a:hover{color:var(--yellow)}
+  .hero{max-width:1160px;margin:0 auto;padding:5rem 2.5rem 3rem;display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:end;animation:up 0.7s 0.1s ease both}
+  .hero-eyebrow{font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--yellow);margin-bottom:1.2rem;display:flex;align-items:center;gap:0.6rem}
+  .hero-eyebrow::before{content:'';width:1.5rem;height:1px;background:var(--yellow)}
+  .hero h1{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(2.8rem,5.5vw,4.8rem);color:var(--white);line-height:1.05}
+  .hero h1 strong{display:block;font-family:'Bebas Neue',sans-serif;font-style:normal;font-size:1.15em;color:var(--yellow);letter-spacing:0.04em;line-height:0.95}
+  .hero-right{padding-bottom:0.25rem}
+  .hero-desc{font-size:0.95rem;color:var(--muted);line-height:1.8;margin-bottom:2rem;max-width:380px}
+  .topic-pills{display:flex;flex-wrap:wrap;gap:0.4rem}
+  .pill{padding:0.3rem 0.8rem;border:1px solid var(--border2);font-size:0.7rem;letter-spacing:0.06em;color:var(--muted);border-radius:2px;background:transparent;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:0.4rem}
+  .pill .pip{width:5px;height:5px;border-radius:50%;background:var(--pc);opacity:0.7;flex-shrink:0}
+  .pill[data-c="y"]{--pc:var(--yellow)}.pill[data-c="o"]{--pc:var(--coral)}.pill[data-c="b"]{--pc:var(--sky)}.pill[data-c="g"]{--pc:var(--mint)}.pill[data-c="p"]{--pc:var(--lavender)}
+  .ticker{border-top:1px solid var(--border);border-bottom:1px solid var(--border);overflow:hidden;padding:0.7rem 0}
+  .ticker-inner{display:flex;gap:2.5rem;animation:scroll 26s linear infinite;white-space:nowrap}
+  .t-word{font-family:'Bebas Neue',sans-serif;font-size:0.85rem;letter-spacing:0.1em;color:var(--dim)}
+  .t-star{color:var(--yellow);font-size:0.55rem;opacity:0.4}
+  .sec-head{max-width:1160px;margin:3rem auto 1.5rem;padding:0 2.5rem;display:flex;justify-content:space-between;align-items:center}
+  .sec-title{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.1em;color:var(--muted)}
+  .sec-title span{color:var(--yellow)}
+  .grid-wrap{max-width:1160px;margin:0 auto;padding:0 2.5rem 6rem}
 
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  /* ── POST CARDS ── */
+  .posts-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1px;border:1px solid var(--border)}
+  .post-card{background:var(--card);padding:2rem;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:1rem;transition:background 0.2s;cursor:pointer}
+  .post-card:hover{background:var(--card-h)}
+  .card-meta{display:flex;align-items:center;gap:0.6rem}
+  .card-topic{font-family:'Bebas Neue',sans-serif;font-size:0.7rem;letter-spacing:0.14em;padding:0.2rem 0.6rem;border:1px solid var(--border2);color:var(--muted)}
+  .card-topic.t-powerbi{border-color:rgba(71,196,255,0.3);color:var(--sky)}
+  .card-topic.t-cricket{border-color:rgba(255,107,71,0.3);color:var(--coral)}
+  .card-date{font-size:0.68rem;color:var(--dim);letter-spacing:0.06em;margin-left:auto}
+  .card-title{font-family:'DM Serif Display',serif;font-style:italic;font-size:1.25rem;color:var(--white);line-height:1.25}
+  .card-desc{font-size:0.82rem;color:var(--muted);line-height:1.75;flex:1}
+  .card-footer{display:flex;align-items:center;justify-content:space-between;padding-top:0.75rem;border-top:1px solid var(--border)}
+  .card-tags{display:flex;gap:0.4rem;flex-wrap:wrap}
+  .card-tag{font-size:0.65rem;letter-spacing:0.06em;color:var(--dim);padding:0.15rem 0.5rem;border:1px solid var(--border)}
+  .card-arrow{font-size:0.75rem;color:var(--yellow);font-family:'Bebas Neue',sans-serif;letter-spacing:0.1em;opacity:0;transition:opacity 0.2s}
+  .post-card:hover .card-arrow{opacity:1}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 300;
-    font-size: 14px;
-    line-height: 1.65;
-    overflow-x: hidden;
-  }
-
-  /* grain overlay */
-  body::after {
-    content: '';
-    position: fixed; inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9999;
-  }
-
-  /* ── NAV ── */
-  nav {
-    padding: 1.4rem 2.5rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: sticky; top: 0;
-    background: rgba(10,10,10,0.93);
-    backdrop-filter: blur(14px);
-    z-index: 100;
-    animation: dn 0.5s ease both;
-  }
-  .brand {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1.5rem;
-    letter-spacing: 0.06em;
-    color: var(--white);
-    text-decoration: none;
-  }
-  .brand .dot { color: var(--yellow); }
-  .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
-  .nav-links a {
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-decoration: none;
-    transition: color 0.2s;
-  }
-  .nav-links a:hover { color: var(--yellow); }
-
-  /* ── HERO ── */
-  .hero {
-    max-width: 1160px;
-    margin: 0 auto;
-    padding: 5rem 2.5rem 3rem;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 3rem;
-    align-items: end;
-    animation: up 0.7s 0.1s ease both;
-  }
-  .hero-eyebrow {
-    font-size: 0.68rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--yellow);
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-  }
-  .hero-eyebrow::before { content:''; width:1.5rem; height:1px; background:var(--yellow); }
-  .hero h1 {
-    font-family: 'DM Serif Display', serif;
-    font-style: italic;
-    font-size: clamp(2.8rem, 5.5vw, 4.8rem);
-    color: var(--white);
-    line-height: 1.05;
-  }
-  .hero h1 strong {
-    display: block;
-    font-family: 'Bebas Neue', sans-serif;
-    font-style: normal;
-    font-size: 1.15em;
-    color: var(--yellow);
-    letter-spacing: 0.04em;
-    line-height: 0.95;
-  }
-  .hero-right { padding-bottom: 0.25rem; }
-  .hero-desc {
-    font-size: 0.95rem;
-    color: var(--muted);
-    line-height: 1.8;
-    margin-bottom: 2rem;
-    max-width: 380px;
-  }
-
-  /* topic pills — display only, no click */
-  .topic-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-  .pill {
-    padding: 0.3rem 0.8rem;
-    border: 1px solid var(--border2);
-    font-size: 0.7rem;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-    border-radius: 2px;
-    background: transparent;
-    font-family: 'DM Sans', sans-serif;
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-  .pill .pip {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--pc);
-    opacity: 0.7;
-    flex-shrink: 0;
-  }
-  .pill[data-c="y"] { --pc: var(--yellow); }
-  .pill[data-c="o"] { --pc: var(--coral); }
-  .pill[data-c="b"] { --pc: var(--sky); }
-  .pill[data-c="g"] { --pc: var(--mint); }
-  .pill[data-c="p"] { --pc: var(--lavender); }
-
-  /* ── TICKER ── */
-  .ticker {
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    overflow: hidden;
-    padding: 0.7rem 0;
-  }
-  .ticker-inner {
-    display: flex;
-    gap: 2.5rem;
-    animation: scroll 26s linear infinite;
-    white-space: nowrap;
-  }
-  .t-word {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 0.85rem;
-    letter-spacing: 0.1em;
-    color: var(--dim);
-  }
-  .t-word.wip {
-    color: var(--coral);
-    opacity: 0.55;
-  }
-  .t-star {
-    color: var(--yellow);
-    font-size: 0.55rem;
-    opacity: 0.4;
-  }
-
-  /* ── SECTION HEADER ── */
-  .sec-head {
-    max-width: 1160px;
-    margin: 3rem auto 1.5rem;
-    padding: 0 2.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .sec-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1rem;
-    letter-spacing: 0.1em;
-    color: var(--muted);
-  }
-  .sec-title span { color: var(--yellow); }
-
-  /* ── EMPTY STATE ── */
-  .grid-wrap {
-    max-width: 1160px;
-    margin: 0 auto;
-    padding: 0 2.5rem 6rem;
-  }
-  .empty-state {
-    border: 1px solid var(--border);
-    padding: 6rem 2rem;
-    text-align: center;
-    background: var(--card);
-    animation: up 0.5s 0.3s ease both;
-  }
-  .empty-glyph {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 3.5rem;
-    color: var(--border2);
-    line-height: 1;
-    margin-bottom: 1.75rem;
-    letter-spacing: 0.1em;
-  }
-  .empty-title {
-    font-family: 'DM Serif Display', serif;
-    font-style: italic;
-    font-size: 1.5rem;
-    color: #555;
-    margin-bottom: 0.75rem;
-  }
-  .empty-sub {
-    font-size: 0.82rem;
-    color: var(--dim);
-    line-height: 1.9;
-    max-width: 320px;
-    margin: 0 auto 2rem;
-  }
-  .empty-tag {
-    display: inline-block;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 0.75rem;
-    letter-spacing: 0.12em;
-    background: var(--border);
-    color: var(--dim);
-    padding: 0.3rem 0.8rem;
-  }
-
-  /* ── FOOTER ── */
-  footer {
-    border-top: 1px solid var(--border);
-    padding: 2rem 2.5rem;
-    max-width: 1160px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.72rem;
-    color: var(--dim);
-  }
-  .footer-brand {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 1rem;
-    letter-spacing: 0.06em;
-    color: var(--muted);
-  }
-  .footer-brand span { color: var(--yellow); }
-
-  /* ── KEYFRAMES ── */
-  @keyframes up     { from { opacity:0; transform:translateY(18px); } to { opacity:1; transform:none; } }
-  @keyframes dn     { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:none; } }
-  @keyframes scroll { from { transform:translateX(0); } to { transform:translateX(-50%); } }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 900px) {
-    .hero { grid-template-columns: 1fr; padding: 3rem 2rem 2rem; gap: 2rem; }
-  }
-  @media (max-width: 600px) {
-    nav { padding: 1.2rem 1.5rem; }
-    .grid-wrap { padding: 0 1.5rem 4rem; }
-    .sec-head { padding: 0 1.5rem; }
-    footer { padding: 1.5rem; flex-direction: column; gap: 0.5rem; text-align: center; }
-  }
+  footer{border-top:1px solid var(--border);padding:2rem 2.5rem;max-width:1160px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;font-size:0.72rem;color:var(--dim)}
+  .footer-brand{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:0.06em;color:var(--muted)}
+  .footer-brand span{color:var(--yellow)}
+  @keyframes up{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  @keyframes dn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+  @keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+  @media(max-width:900px){.hero{grid-template-columns:1fr;padding:3rem 2rem 2rem;gap:2rem}}
+  @media(max-width:600px){nav{padding:1.2rem 1.5rem}.grid-wrap{padding:0 1.5rem 4rem}.sec-head{padding:0 1.5rem}footer{padding:1.5rem;flex-direction:column;gap:0.5rem;text-align:center}}
 </style>
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <a class="brand" href="#">Basically<span class="dot">.</span>Curious</a>
   <ul class="nav-links">
@@ -292,14 +79,10 @@
   </ul>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div>
     <p class="hero-eyebrow">No fixed topic. Just curiosity.</p>
-    <h1>
-      <strong>Basically.</strong>
-      Curious
-    </h1>
+    <h1><strong>Basically.</strong>Curious</h1>
   </div>
   <div class="hero-right">
     <p class="hero-desc">Written whenever something is catches the eye.</p>
@@ -312,58 +95,68 @@
   </div>
 </section>
 
-<!-- TICKER -->
 <div class="ticker">
   <div class="ticker-inner">
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
-        <!-- duplicate for seamless loop -->
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
-        <!-- duplicate for seamless loop -->
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
-        <!-- duplicate for seamless loop -->
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
-        <!-- duplicate for seamless loop -->
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
-        <!-- duplicate for seamless loop -->
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
-        <!-- duplicate for seamless loop -->
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
-        <!-- duplicate for seamless loop -->
-    <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>        
-        <!-- duplicate for seamless loop -->
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
-        <!-- duplicate for seamless loop -->
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
-        <!-- duplicate for seamless loop -->
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
-        <!-- duplicate for seamless loop -->
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
-        <!-- duplicate for seamless loop -->
+    <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
     <span class="t-word">Brewing In-Progress</span><span class="t-star">✦</span>
   </div>
 </div>
 
-<!-- POSTS SECTION -->
 <div class="sec-head">
   <div class="sec-title">Latest <span>Posts</span></div>
 </div>
 
 <div class="grid-wrap">
-  <div class="empty-state">
-    <div class="empty-glyph">· · ·</div>
-    <div class="empty-title">Something's brewing.</div>
-    <div class="empty-sub">
-      No posts yet — but the first one is already on its way.<br/>
-      Come back soon.
-    </div>
-    <div class="empty-tag">First Post — Coming Soon</div>
+
+  <div class="posts-grid">
+
+    <!-- ═══════════════════════════════════════════════
+         CARD 1 — Power BI Relationships Guide
+         ═══════════════════════════════════════════════ -->
+    <a class="post-card" href="PowerBI/powerbi-relationships.html">
+      <div class="card-meta">
+        <span class="card-topic t-powerbi">Power BI</span>
+        <span class="card-topic t-cricket">Cricket</span>
+        <span class="card-date">Apr 2026</span>
+      </div>
+      <div class="card-title">Table Relationships — Cardinality & Cross-Filter Explained</div>
+      <div class="card-desc">
+        Confused by Cardinality and Cross-Filter Direction in Power BI? This guide walks through every concept — from beginner to expert — using real IPL cricket data as examples.
+      </div>
+      <div class="card-footer">
+        <div class="card-tags">
+          <span class="card-tag">Power BI</span>
+          <span class="card-tag">IPL</span>
+          <span class="card-tag">Data Modelling</span>
+          <span class="card-tag">Star Schema</span>
+        </div>
+        <span class="card-arrow">Read →</span>
+      </div>
+    </a>
+
+    <!-- ═══════════════════════════════════════════════
+         ADD YOUR NEXT CARD HERE — copy the block above,
+         paste below this comment, change the content.
+         ═══════════════════════════════════════════════ -->
+
   </div>
+
 </div>
 
-<!-- FOOTER -->
 <footer>
   <span class="footer-brand">Basically<span>.</span>Curious</span>
-  <span>Written whenever something is catches the eye.</span>
+  <span>Written whenever something catches the eye.</span>
   <span>© 2026</span>
 </footer>
 
